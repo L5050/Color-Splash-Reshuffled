@@ -13,6 +13,7 @@ Makes the game's battles fun (only available for the US version of color splash)
 
 ## Installation
 Go to the [releases page](https://github.com/L5050/Color-Splash-Reshuffled/releases) and download the most recent release (Reshuffled.zip). Unzip this into the graphics packs folder in Cemu, then right click color splash in Cemu and click "Edit Graphics Packs". You should see the Reshuffled mod under the mods section, click the checkbox and you're good to go!
+Note: it is important to use the release rather than the source code because the release contains compressed battle data which replaces one of the games files
 
 ## Credit
 * Thank you to Xuman, GearedGuy, and Darxoon for helping me RE the game and for letting me bounce ideas off of them
