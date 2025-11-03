@@ -10,6 +10,9 @@ Makes the game's battles fun (only available for the US version of color splash)
 - Roshambo no longer gives coins as a reward, and doesn't cost any coins to sneak in
 - Roshambo's snack bar doesn't cost any coins
 - Thing cards have a heavily increased paint cost
+- Kamek can't turn your cards into replicas
+- Mario gets a major movement speed buff
+- Leveling up gives you more paint than before
 
 ## Installation
 Go to the [releases page](https://github.com/L5050/Color-Splash-Reshuffled/releases) and download the most recent release (Reshuffled.zip). Unzip this into the graphics packs folder in Cemu, then right click color splash in Cemu and click "Edit Graphics Packs". You should see the Reshuffled mod under the mods section, click the checkbox and you're good to go!
