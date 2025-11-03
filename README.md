@@ -13,6 +13,7 @@ Makes the game's battles fun (only available for the US version of color splash)
 - Kamek can't turn your cards into replicas
 - Mario gets a major movement speed buff
 - Leveling up gives you more paint than before
+- The amount of damage that cards do is listed on the card description, and enemy max HP is listed
 
 ## Installation
 Go to the [releases page](https://github.com/L5050/Color-Splash-Reshuffled/releases) and download the most recent release (Reshuffled.zip). Unzip this into the graphics packs folder in Cemu, then right click color splash in Cemu and click "Edit Graphics Packs". You should see the Reshuffled mod under the mods section, click the checkbox and you're good to go!
