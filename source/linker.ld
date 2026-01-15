@@ -7,4 +7,13 @@ SECTIONS
     {
         *(.text*)
     }
+
+    .bss :
+    {
+        *(.bss*)
+        __bss_start = .;
+        __bss_end = .;
+        __end__ = .;
+        _end = .;
+    }
 }

@@ -21,7 +21,7 @@ set(CS_HEADERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cs-headers)
 
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/source/linker.ld
-    ${CMAKE_CURRENT_BINARY_DIR}/source/linker.ld
+    ${CMAKE_CURRENT_BINARY_DIR}/linker.ld
     @ONLY
 )
 

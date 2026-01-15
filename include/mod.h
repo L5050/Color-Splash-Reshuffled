@@ -1,10 +1,11 @@
 #include <coreinit/dynload.h>
+#include <common.h>
 
 #ifndef MY_FIRST_RPL_H
 #define MY_FIRST_RPL_H
 
 namespace mod {
-
+  
 void mod_main();
 
 }
