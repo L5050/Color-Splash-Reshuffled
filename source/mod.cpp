@@ -276,6 +276,35 @@ void marioDamageBuff(int turtle3, int turtle4, int* turtle5, int turtle6, int tu
   return;
 }
 
+int makeBlackPaint()
+{
+  ((void (*)())0x0248c620)();
+  return 1;
+}
+
+int* makeBlackPaint2(s32 *unithandle)
+{
+  ((void (*)(int * handle, int parts, f32 r, f32 g, f32 b, f32 a))0x024e2a0c)(unithandle, 0, 0.0f, 0.0f, 0.0f, 155.0f);
+  return unithandle;
+}
+
+int* makeBlackPaint3(s32 *unithandle)
+{ 
+  ((void (*)(int integer))0x0254614c)(0x1);
+  ((void (*)(int integer))0x02546118)(0x1);
+  return ((int* (*)(int* pointer))0x0226dbcc)(unithandle);
+}
+
+int* fixCutOut(s32 *pointer1, s32 *pointer2)
+{ 
+  asm("stfs 30, 0x18(1)");
+  if (pointer2 == nullptr)
+  {
+    pointer2 = ((s32 * (*)(s32 *pointer, f32 destX, f32 desty))0x02301e54)(pointer1, 74.0f, 24.0f);
+  }
+  return ((int* (*)(int* pointer, int* pointer_2))0x02305e60)(pointer1, pointer2);
+}
+
 void mod_main()
 {
    // Turn off the function thats used in all EVT scripts to set your coin count
@@ -307,6 +336,12 @@ void mod_main()
    writeBranchLink(0x02141674, 0x0, marioDamageBuff3); 
    writeWord(0x024c9590, 0x0, BLR);
    writeWord(0x024c9468, 0x0, BLR);
+
+  writeBranch(0x02567cec, 0x0, makeBlackPaint);
+  //writeBranch(0x024b25c0, 0x0, makeBlackPaint2);
+  writeBranchLink(0x02567c3c, 0x0, makeBlackPaint3);
+
+  //writeBranchLink(0x02305e5c, 0x0, fixCutOut);
 
    return;
 }
