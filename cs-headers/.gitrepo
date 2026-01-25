@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/L5050/cs-headers.git
 	branch = master
-	commit = ef573c36e9ac24a558bf3f20eb78a6ad2849e0c3
-	parent = ed4cd5074f3d803d0296d16b559e5f8aacda8a28
+	commit = 12c4af8cf59a2fbd1c31149cd3d8df0b164159df
+	parent = 6ab4bc2caaf61a6ce31e802b4be4bce5d7d10974
 	method = merge
 	cmdver = 0.4.9
