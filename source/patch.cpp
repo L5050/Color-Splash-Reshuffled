@@ -1,11 +1,24 @@
 #include <mod.h>
 #include <coreinit/memory.h>
 #include <coreinit/cache.h>
+#include <coreinit/memorymap.h>
 #include <patch.h>
 #include <common.h>
 #include <cstdint>
 
 namespace mod {
+
+KernelCopyDataFn_t KernelCopyDataFn;
+
+void _init_mod(KernelCopyDataFn_t func)
+{
+  if (func == nullptr)
+  {
+    return;
+  }
+  KernelCopyDataFn = func;
+  return mod::mod_main();
+}
 
 void clear_DC_IC_Cache(void * ptr, u32 size)
 {
@@ -21,7 +34,8 @@ void clear_DC_IC_Cache(void * ptr, u32 size)
       value |= (delta & 0x03FFFFFC);
       
       u32 * p = reinterpret_cast<u32 *>(ptr);
-      *p = value;
+      KernelCopyDataFn(OSEffectiveToPhysical((u32)p), OSEffectiveToPhysical((u32)(u32*)ptr), sizeof(u32));
+      //*p = value;
 
       clear_DC_IC_Cache(ptr, sizeof(u32));
 
@@ -31,7 +45,8 @@ void clear_DC_IC_Cache(void * ptr, u32 size)
   void _writeWord(void * ptr, u32 value)
   {
       int * p = (int *)(ptr);
-      *p = value;
+      //*p = value;
+      KernelCopyDataFn(OSEffectiveToPhysical((u32)p), OSEffectiveToPhysical((u32)(u32*)ptr), sizeof(u32));
       clear_DC_IC_Cache(ptr, sizeof(u32));
       return;
   }

@@ -3,10 +3,21 @@
 #include <mod.h>
 
 #include <coreinit/dynload.h>
+#include <whb/log.h>
+#include <whb/log_console.h>
+#include <whb/proc.h>
+
+extern "C"
+{
+int rpl_init_mod(KernelCopyDataFn_t func)
+{
+  mod::_init_mod(func);
+  return 1;
+}
+}
 
 
 int rpl_entry(OSDynLoad_Module module, OSDynLoad_EntryReason reason)
 {
-   mod::mod_main();
-   return 1;
+  return 1; 
 }
