@@ -2336,6 +2336,14 @@ inline MarioPouch** GetMarioPouch() {
     return (MarioPouch**)0x100b5f54;
 }
 
+inline f32 GetMarioSpeed() {
+    return (f32)0x100d7ad4;
+}
+
+inline void SetMarioSpeed() {
+    return ((void(*)())0x0220afe8)();
+}
+
 s32 GetCoin();
 void SetCoin(s32 count);
 void AddCoin(s32 count);
@@ -2357,6 +2365,11 @@ inline s32 GetPanelNum() {
 inline void AddPanel(const char * name) {
     return ((void(*)(const char * name))0x0247509c)(name);
 }
+
+inline void AddPanelByID(MarioPouch* pouchPanels, s32 id) {
+    return ((void(*)(MarioPouch* pouchPanels, s32 id))0x0220d648)(pouchPanels, id);
+}
+
 
 void SetHP(s32 hp);
 void GetInk(GameInk * ink);
