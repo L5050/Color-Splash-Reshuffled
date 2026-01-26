@@ -27,7 +27,7 @@ Makes the game's battles fun (only available for the US version of color splash)
 - 1-UP cards aren't available in the shop as early, unlocking once Mossrock theatre is visited instead of during chapter 3
 
 ## Installation
-Go to the [releases page](https://github.com/L5050/Color-Splash-Reshuffled/releases) and download the most recent release files (Reshuffled.zip and cafeLibs.zip). Unzip Reshuffled.zip into the graphics packs folder in Cemu, then right click color splash in Cemu and click "Edit Graphics Packs". You should see the Reshuffled mod under the mods section, click the checkbox and you're halfway done! Unzip cafeLibs.zip directly into the Cemu folder (right next to Cemu.exe) and you're now good to play!
+Go to the [releases page](https://github.com/L5050/Color-Splash-Reshuffled/releases) and download the most recent release files (Reshuffled.zip and cafeLibs.zip). Unzip Reshuffled.zip into the graphics packs folder in Cemu, then right click color splash in Cemu and click "Edit Graphics Packs". You should see the Reshuffled mod under the mods section, click the checkbox and you're halfway done! Unzip cafeLibs.zip directly into the Cemu folder (go to Cemu, click on File, then click Open Cemu folder) and you're now good to play!
 * Note: it is important to use the release rather than the source code because the release contains compressed battle and shop data which replaces some of the game's files
 
 ## Credit
