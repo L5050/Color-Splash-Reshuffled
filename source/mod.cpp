@@ -21,6 +21,168 @@ u32 modVpadFlags = 0;
 int hopefullyThisWorks = 0;
 int turtle10backup = 0;
 
+extern "C"
+{
+  f32 _speedBuff = 0.85f;
+  void * speedRet = (void *)0x0220b07c;
+  void * levelUpRet = (void *)0x02211b08;
+  void * XPRet = (void *)0x02211050;
+  void * _damageFunc = (void *)0x0213c1e8; 
+  void * _isEnemyBuffFixRet = (void *)0x0213dcf4;
+  void * _kamekRet = (void *)0x0218b138;
+  f32 _healthBuff = 0.3f;
+  int _isNpcMario = 0;
+  f32 _fixSoftlock = 1.0f;
+  f32 _fixBigDamage = 199.0f;
+
+  void _handleKamek();
+    asm
+    (
+      ".global _handleKamek\n"
+      "_handleKamek:\n"
+      "li 0, 0x2\n"
+      "stw 0, 0x1d10(31)\n"
+      "lis 5, _kamekRet@ha\n"
+      "lwz 5, _kamekRet@l(5)\n"
+      "mtctr 5\n"
+      "bctr\n"
+    );
+
+  void _patchMarioSpeed();
+    asm
+    (
+      ".global _patchMarioSpeed\n"
+      "_patchMarioSpeed:\n"
+      "lis 5, _speedBuff@ha\n"
+      "lfs 2, _speedBuff@l(5)\n"
+      "lis 5, speedRet@ha\n"
+      "lwz 5, speedRet@l(5)\n"
+      "mtctr 5\n"
+      "bctr\n"
+    );
+
+  void _patchLevelUps();
+  asm(
+    ".global _patchLevelUps\n"
+    "_patchLevelUps:\n"
+    "add 0, 12, 3\n"
+    "li 3, 0x1E\n"
+    "add 0, 0, 3\n"
+    "lis 5, levelUpRet@ha\n"
+    "lwz 5, levelUpRet@l(5)\n"
+    "mtctr 5\n"
+    "bctr\n"
+    );
+
+  void _patchXp();
+  asm(
+    ".global _patchXp\n"
+    "_patchXp:\n"
+    "add. 12, 11, 4\n"
+    "add. 12, 11, 4\n"
+    "lis 5, XPRet@ha\n"
+    "lwz 5, XPRet@l(5)\n"
+    "mtctr 5\n"
+    "bctr\n"
+    );
+    
+  void _makeMartyoDamageVisible();
+  asm(
+    ".global _makeMartyoDamageVisible\n"
+    "_makeMartyoDamageVisible:\n"
+    "li 8, 0\n"
+    "cmpwi 8, 0\n"
+    "blr\n"
+    );
+    
+  void _visibleDamageCheck();
+  asm(
+    ".global _visibleDamageCheck\n"
+    "_visibleDamageCheck:\n"
+    "cmpwi 8, 2\n"
+    "beq _makeMartyoDamageVisible\n"
+    "cmpwi 8, 0\n"
+    "blr\n"
+    );
+    
+  void _isEnemyBuffFix();
+  asm(
+    ".global _isEnemyBuffFix\n"
+    "_isEnemyBuffFix:\n"
+    "lis 4, _isNpcMario@ha\n"
+    "ori 4, 4, _isNpcMario@l\n"
+    "li 3, 0\n"
+    "stw 3, 0(4)\n"
+    "lis 5, _isEnemyBuffFixRet@ha\n"
+    "lwz 5, _isEnemyBuffFixRet@l(5)\n"
+    "mtctr 5\n"
+    "bctr\n"
+    );
+    
+  void _fixDamageBuffIssue();
+  asm(
+    ".global _fixDamageBuffIssue\n"
+    "_fixDamageBuffIssue:\n"
+    "lis 4, _damageFunc@ha\n"
+    "lwz 4, _damageFunc@l(4)\n"
+    "cmpw 0, 4, 5\n"
+    "bne _isEnemyBuffFix\n"
+    "lis 4, _isNpcMario@ha\n"
+    "ori 4, 4, _isNpcMario@l\n"
+    "li 3, 1\n"
+    "stw 3, 0(4)\n"
+    "lis 5, _isEnemyBuffFixRet@ha\n"
+    "lwz 5, _isEnemyBuffFixRet@l(5)\n"
+    "mtctr 5\n"
+    "bctr\n"
+    );
+
+  void _moreDamage();
+  asm(
+    ".global _moreDamage\n"
+    "_moreDamage:\n"
+    "lis 4, _isNpcMario@ha\n"
+    "lwz 4, _isNpcMario@l(4)\n"
+    "cmpwi 4, 1\n"
+    "bne _isEnemy\n"
+    "li 4, 0\n"
+    "lis 5, _healthBuff@ha\n"
+    "lfs 3, _healthBuff@l(5)\n"
+    "fmuls 10, 10, 3\n"
+    "fsubs 29, 29, 10\n"
+    "li 5, 0\n"
+    "blr\n"
+    );
+    
+  void _maxHpDefense();
+  asm(
+    ".global _maxHpDefense\n"
+    "_maxHpDefense:\n"
+    "fmr 10, 4\n"
+    "fsubs 29, 29, 10\n"
+    "blr\n"
+    );
+    
+  void _isEnemy();
+  asm(
+    ".global _isEnemy\n"
+    "_isEnemy:\n"
+    "li 4, 0x0\n"
+    "li 5, 0x0\n"
+    "fadd 10, 10, 10\n"
+    "lis 5, _fixSoftlock@ha\n"
+    "lfs 3, _fixSoftlock@l(5)\n"
+    "lis 5, _fixBigDamage@ha\n"
+    "lfs 4, _fixBigDamage@l(5)\n"
+    "fcmpo 0, 10, 4\n"
+    "bgt _maxHpDefense\n"
+    "fsubs 10, 10, 3\n"
+    "fsubs 29, 29, 10\n"
+    "blr\n"
+    );
+}
+
+
 char *removeSubstring(char *mainString, const char *subString)
 {
   size_t subLen = strlen(subString);
@@ -195,6 +357,7 @@ u32 newMsgIsBusy(u32 IsBusy, u32 unk)
   u32 result = modVpadFlags & 0x4000;
   if (result != 0)
   {
+    //cs::mario_pouch::SetCoin(0); relocation testing only
     return 1;
   }
   return 0;
@@ -295,14 +458,25 @@ int* makeBlackPaint3(s32 *unithandle)
   return ((int* (*)(int* pointer))0x0226dbcc)(unithandle);
 }
 
-int* fixCutOut(s32 *pointer1, s32 *pointer2)
+void fixCutOut(int* pointer)
 { 
-  asm("stfs 30, 0x18(1)");
-  if (pointer2 == nullptr)
+  asm("mr 3, 30");
+  return ((void (*)(int* integer, int cutout))0x02306a68)(pointer, 0x5);
+}
+
+f32 fixCutoutFloat()
+{
+  return 75.0f;
+}
+
+void patchPaintedItems(cs::mario_pouch::MarioPouch* pouchPanels, s32 id)
+{
+  if (id > 0xf3 && id < 0x12b)
   {
-    pointer2 = ((s32 * (*)(s32 *pointer, f32 destX, f32 desty))0x02301e54)(pointer1, 74.0f, 24.0f);
+    id += -0x94;
   }
-  return ((int* (*)(int* pointer, int* pointer_2))0x02305e60)(pointer1, pointer2);
+  OSReport("card id %d", id);
+  return cs::mario_pouch::AddPanelByID(pouchPanels, id);
 }
 
 void mod_main()
@@ -311,6 +485,7 @@ void mod_main()
    writeWord(cs::mario_pouch::SetCoin, 0x0, BLR);
    // Speed up btl spin menu slightly
    writeWord(cs::btl_spin::btlSpinMain, 0x0, 0x3800000A);
+  writeBranch(0x02567cec, 0x0, makeBlackPaint);
    
    writeBranchLink(0x021a2018, 0x0, new_GetBattleSpinCard);
    
@@ -337,13 +512,46 @@ void mod_main()
    writeWord(0x024c9590, 0x0, BLR);
    writeWord(0x024c9468, 0x0, BLR);
 
-  writeBranch(0x02567cec, 0x0, makeBlackPaint);
   //writeBranch(0x024b25c0, 0x0, makeBlackPaint2);
   writeBranchLink(0x02567c3c, 0x0, makeBlackPaint3);
 
   //writeBranchLink(0x02305e5c, 0x0, fixCutOut);
 
-   return;
+  // assembly patch BLRs and NOPs
+   writeWord(0x0218fe1c, 0x0, BLR);
+   writeWord(0x0218d578, 0x0, BLR);
+   writeWord(0x02475650, 0x0, BLR);
+   writeWord(0x0218801c, 0x0, NOP);
+   writeWord(0x02312ad8, 0x0, NOP);
+   writeWord(0x02312adc, 0x0, NOP);
+   writeWord(0x02312ae8, 0x0, NOP); 
+   writeWord(0x02312adc, 0x0, NOP);
+   //writeWord(0x0220b080, 0x0, NOP);
+
+   // assembly patch for cutout floats
+  writeBranchLink(0x02312b34, 0x0, fixCutoutFloat);
+  writeBranchLink(0x02312b40, 0x0, fixCutoutFloat);
+  writeBranch(0x02312dfc, 0x0, fixCutOut); 
+  writeBranch(0x0220b078, 0x0, _patchMarioSpeed);
+
+  // level up assembly patch
+  writeBranch(0x02211b04, 0x0, _patchLevelUps);
+  writeBranch(0x0221104c, 0x0, _patchXp);
+
+  // painted items patch
+  writeBranch(0x0221249c, 0x0, patchPaintedItems);
+
+  // damage numbers patch
+  writeBranchLink(0x02140cb4, 0x0, _visibleDamageCheck);
+
+  // health change patch
+  writeBranchLink(0x0213dd14, 0x0, _moreDamage);
+  writeBranchLink(0x0213dcf0, 0x0, _fixDamageBuffIssue);
+
+  // fix kamek 
+  writeBranchLink(0x0218fbf8, 0x0, _handleKamek);
+
+  return;
 }
 
 }

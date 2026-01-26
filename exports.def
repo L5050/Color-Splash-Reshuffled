@@ -2,4 +2,4 @@
 
 :TEXT
 rpl_entry
-SetCoin
+rpl_init_mod

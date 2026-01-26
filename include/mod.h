@@ -3,18 +3,13 @@
 
 #ifndef MY_FIRST_RPL_H
 #define MY_FIRST_RPL_H
+typedef void (*KernelCopyDataFn_t)(u32 dst, u32 src, u32 len);
 
 namespace mod {
-  
+
+void _init_mod(KernelCopyDataFn_t func);
 void mod_main();
 
 }
-
-int
-my_first_export();
-
-int
-rpl_entry(OSDynLoad_Module module,
-          OSDynLoad_EntryReason reason);
 
 #endif // MY_FIRST_RPL_H
