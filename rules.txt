@@ -1,6 +1,0 @@
-[Definition]
-titleIds = 000500001f600a00
-name = Reshuffled
-path = "Paper Mario: Color Splash/Mods/Reshuffled"
-description = Needs to be enabled before (and can't be disabled after) running the game, otherwise it'll crash.
-version = 7

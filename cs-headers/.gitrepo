@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/L5050/cs-headers.git
+	branch = master
+	commit = ef573c36e9ac24a558bf3f20eb78a6ad2849e0c3
+	parent = ed4cd5074f3d803d0296d16b559e5f8aacda8a28
+	method = merge
+	cmdver = 0.4.9
