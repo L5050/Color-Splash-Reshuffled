@@ -485,6 +485,7 @@ void mod_main()
    writeWord(cs::mario_pouch::SetCoin, 0x0, BLR);
    // Speed up btl spin menu slightly
    writeWord(cs::btl_spin::btlSpinMain, 0x0, 0x3800000A);
+  writeBranch(0x02567cec, 0x0, makeBlackPaint);
    
    writeBranchLink(0x021a2018, 0x0, new_GetBattleSpinCard);
    
@@ -511,7 +512,6 @@ void mod_main()
    writeWord(0x024c9590, 0x0, BLR);
    writeWord(0x024c9468, 0x0, BLR);
 
-  writeBranch(0x02567cec, 0x0, makeBlackPaint);
   //writeBranch(0x024b25c0, 0x0, makeBlackPaint2);
   writeBranchLink(0x02567c3c, 0x0, makeBlackPaint3);
 

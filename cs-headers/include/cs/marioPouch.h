@@ -2345,7 +2345,11 @@ inline void SetMarioSpeed() {
 }
 
 s32 GetCoin();
-void SetCoin(s32 count);
+
+inline void SetCoin() {
+    return ((void(*)())0x02475650)();
+}
+
 void AddCoin(s32 count);
 void AddKeyItem(const char *key);
 s32 GetMaxHP();

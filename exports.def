@@ -1,4 +1,5 @@
 :NAME mod.rpl
 
 :TEXT
+rpl_entry
 rpl_init_mod
