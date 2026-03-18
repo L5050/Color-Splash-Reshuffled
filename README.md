@@ -34,4 +34,4 @@ Go to the [releases page](https://github.com/L5050/Color-Splash-Reshuffled/relea
 * Xuman for editing the card shop for me and general help with RE
 * Darxoon for creating paintelf and for help with RE
 * [Joby "Jorby" R](https://www.youtube.com/@JobyRJorby) for helping playtest the pre-release builds and giving good criticism/advice
-* [Bringle](https://www.youtube.com/@BringlesCan) for making the new opening cutscene
+* [Bringle](https://www.youtube.com/@BringlesCan) for making the new opening cutscene and the new 1-UP card texture
