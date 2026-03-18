@@ -38,6 +38,11 @@ Func hookFunction(Func function, Dest destination)
 
     // Branch to original function past hook
     _writeBranch(&trampoline[1], &instructions[1]);
+    //void ** outaddr = nullptr;
+    //uint32_t outsize = 0;
+    //OSGetCodegenVirtAddrRange(outaddr, &outsize);
+    //OSCodegenCopy(outaddr, trampoline, 8);
+    //clear_DC_IC_Cache(outaddr, 8);
     
     // Write actual hook
     _writeBranch(&instructions[0], reinterpret_cast<void *>(static_cast<Func>(destination)));

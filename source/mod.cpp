@@ -7,8 +7,9 @@
 #include <cs/mariosnd.h>
 #include <cs/btl_ac.h>
 #include <cs/btl_unit.h>
-#include <cs/evt.h>
+#include <cs/btl_weapon.h>
 #include <cs/btl_eff.h>
+#include <cs/evt.h>
 #include <cstring>
 
 namespace mod {
@@ -123,6 +124,7 @@ extern "C"
   asm(
     ".global _fixDamageBuffIssue\n"
     "_fixDamageBuffIssue:\n"
+    "mflr 5\n"
     "lis 4, _damageFunc@ha\n"
     "lwz 4, _damageFunc@l(4)\n"
     "cmpw 0, 4, 5\n"
@@ -144,7 +146,7 @@ extern "C"
     "lis 4, _isNpcMario@ha\n"
     "lwz 4, _isNpcMario@l(4)\n"
     "cmpwi 4, 1\n"
-    "beq _isEnemy\n"
+    "bne _isEnemy\n"
     "li 4, 0\n"
     "lis 5, _healthBuff@ha\n"
     "lfs 3, _healthBuff@l(5)\n"
@@ -169,14 +171,10 @@ extern "C"
     "_isEnemy:\n"
     "li 4, 0x0\n"
     "li 5, 0x0\n"
-    "fadd 10, 10, 10\n"
-    "lis 5, _fixSoftlock@ha\n"
-    "lfs 3, _fixSoftlock@l(5)\n"
     "lis 5, _fixBigDamage@ha\n"
     "lfs 4, _fixBigDamage@l(5)\n"
     "fcmpo 0, 10, 4\n"
     "bgt _maxHpDefense\n"
-    "fsubs 10, 10, 3\n"
     "fsubs 29, 29, 10\n"
     "blr\n"
     );
@@ -339,10 +337,7 @@ s32 patchVpad(s32 isLoaded, u32 vpadFlags)
   u32 result = modVpadFlags & 0x4000;
   if (result != 0)
   {
-    if ((s32)cs::mario_pouch::GetPanelNum < 99)
-    {
-      //cs::mario_pouch::AddPanel("PNL_BOM");
-    }
+    // reserved for later
   }
   result = vpadFlags & 0x8000;
   if (result != 0)
@@ -397,7 +392,7 @@ void marioDamageBuff4(int turtle3, int turtle4, int turtle5, int turtle6, int tu
 void marioDamageBuff3(int turtle3, int turtle4, int turtle5, int turtle6, int turtle7, int turtle8, int turtle9)
 {
   asm("lwz 9, 0x126c(28)");
-  if (turtle9 == turtle10backup)
+  if (turtle9 == turtle10backup && _isNpcMario)
   {
     turtle9 = hopefullyThisWorks;
     marioDamageBuff4(turtle3, turtle4, turtle5, turtle6, turtle7, turtle8, turtle9);
@@ -421,8 +416,18 @@ bool marioDamageCheck(int* param_1, int *param_2)
   return 0;
 }
 
+void _fixDamageBuffIssue2()
+{
+  asm("mr 3, 28");
+  asm("lwz 3, 0x3408(3)");
+  asm("cntlzw 3, 3");
+  asm("rlwinm 3, 3,0x1b,0x5,0x1f");
+  return;
+}
+
 void marioDamageBuff(int turtle3, int turtle4, int* turtle5, int turtle6, int turtle7, int turtle8, int turtle9, int turtle10, float fTurtle1, float fTurtle2)
 {
+  _isNpcMario = turtle3;
   int currentLevel = (*cs::mario_pouch::GetMarioPouch())->xpStruct.level;
   // f32 damage = (f32)turtle10;
   turtle10backup = turtle10;
@@ -458,6 +463,19 @@ int* makeBlackPaint3(s32 *unithandle)
   return ((int* (*)(int* pointer))0x0226dbcc)(unithandle);
 }
 
+typedef struct
+{
+    f32 x, y, z;
+} Vec3;
+
+Vec3 cutoutVec = {0.0f, 0.0f, 0.0f};
+
+int permaFixCutout()
+{
+  ((void (*)(Vec3 *))0x0257418c)(&cutoutVec);
+  return ((int (*)(f32 x, f32 y))0x02301e54)(cutoutVec.x, cutoutVec.y);
+}
+
 void fixCutOut(int* pointer)
 { 
   asm("mr 3, 30");
@@ -469,14 +487,119 @@ f32 fixCutoutFloat()
   return 75.0f;
 }
 
-void patchPaintedItems(cs::mario_pouch::MarioPouch* pouchPanels, s32 id)
+static void patchPaintedItems(cs::mario_pouch::MarioPouch* pouchPanels, s32 id)
 {
-  if (id > 0xf3 && id < 0x12b)
+  if (id > 0xf2 && id < 0x12b)
   {
     id += -0x94;
   }
   OSReport("card id %d", id);
   return cs::mario_pouch::AddPanelByID(pouchPanels, id);
+}
+
+bool attacksChanged = false;
+
+static int enemyAttack()
+{
+  int currentLevel = (*cs::mario_pouch::GetMarioPouch())->xpStruct.level;
+  if (attacksChanged == true)
+  {
+    return 0;
+  }
+
+  cs::btl_unit::Actor * actorStruct = cs::btl_unit::returnActorData("CAMERA_MAR");
+  for (u32 i = 0; i < 263; i++) 
+  {
+    actorStruct[i].HP *= 3;
+  }
+
+  f32 fCurrentLevel = (f32)currentLevel;
+  f32 damageBuff = (fCurrentLevel / 10.0f) + 1.0f;
+
+  cs::btl_weapon::BattleWeapon * weaponStruct = cs::btl_weapon::returnWeaponData("DUMMY"); // set the index to player attacks
+  for (u32 i = 0; i < 168; i++) 
+  {
+    weaponStruct[i].Painted_Bonus_Damage *= damageBuff;
+  }
+
+  weaponStruct = cs::btl_weapon::returnWeaponData("KUR_HEAD_ATTACK"); // set the index to enemy attacks
+  for (u32 i = 0; i < 655; i++) 
+  {
+    if (weaponStruct[i].Painted_Bonus_Damage > 1)
+    {
+      weaponStruct[i].Painted_Bonus_Damage *= 2;
+    }
+  }
+  cs::btl_weapon::returnWeaponData("MTN_FIRE_ATTACK")->Painted_Bonus_Damage = 25;
+  cs::btl_weapon::returnWeaponData("IGY_DOSSUN_ATTACK")->Painted_Bonus_Damage = 30;
+  cs::btl_weapon::returnWeaponData("LDW_MISSILE_KILL_ATTACK")->Painted_Bonus_Damage = 15;
+  cs::btl_weapon::returnWeaponData("WDY_COIN_1_ATTACK")->Painted_Bonus_Damage = 0;
+  cs::btl_weapon::BattleWeapon * larry = cs::btl_weapon::returnWeaponData("LAR_SPECIAL_HIP_ATTACK");
+  larry->Painted_Bonus_Damage = 5;
+  larry->Bonus_Damage_1 = 10;
+  larry->Bonus_Damage_2 = 20;
+  larry->Bonus_Damage_3 = 30;
+  larry->Bonus_Damage_4 = 40;
+  cs::btl_weapon::returnWeaponData("LMY_BIG_BALL_ATTACK")->Painted_Bonus_Damage = 3;
+  cs::btl_weapon::returnWeaponData("LMY_BIG_BALL_LAST_ATTACK")->Painted_Bonus_Damage = 15;
+
+  attacksChanged = true;
+  return 0;
+}
+
+
+void runInventoryChecks(int param_1)
+{
+  int *piVar1;
+  short *panels;
+  int *piVar2;
+  
+  panels = (*cs::mario_pouch::GetMarioPouch())->panels;
+  for (u8 i = 0; i < 99; i++)
+  {
+    if(panels[i] == 0x12b)
+    {
+      panels[i] = 0;
+    }
+  }
+  
+  //cs::mario_pouch::KillPanels(panels);
+  piVar1 = *(int **)(param_1 + 8);
+  piVar2 = *(int **)(param_1 + 4);
+  if (piVar2 != piVar1) {
+    do {
+      if((short)*(u32 *)(*piVar2 + 0xdc) == 0x12b)
+      {
+        cs::mario_pouch::RefreshInventory(panels,(short)*(u32 *)(*piVar2 + 0xdc));
+      }
+
+        piVar1 = *(int **)(param_1 + 8);
+      piVar2 = piVar2 + 1;
+    } while (piVar2 != piVar1);
+  }
+  return;
+}
+
+
+
+void levelupIncreaseDamage(cs::mario_pouch::XpStruct * xp, int count)
+{
+  cs::mario_pouch::AddXP(xp, count);
+  int currentLevel = (*cs::mario_pouch::GetMarioPouch())->xpStruct.level - 1;
+  f32 fCurrentLevel = (f32)currentLevel;
+  f32 damageBuff = (fCurrentLevel / 10.0f) + 1.0f;
+  cs::btl_weapon::BattleWeapon * weaponStruct = cs::btl_weapon::returnWeaponData("DUMMY"); // set the index to player attacks
+  for (u32 i = 0; i < 168; i++) 
+  {
+    weaponStruct[i].Painted_Bonus_Damage /= damageBuff;
+  }
+  fCurrentLevel = (f32)(*cs::mario_pouch::GetMarioPouch())->xpStruct.level + 1;
+  damageBuff = (fCurrentLevel / 10.0f) + 1.0f;
+  for (u32 i = 0; i < 168; i++) 
+  {
+    weaponStruct[i].Painted_Bonus_Damage *= damageBuff;
+  }
+  return;
 }
 
 void mod_main()
@@ -506,37 +629,42 @@ void mod_main()
 
    writeBranch(0x024c407c, 0x0, colorEnemy);
 
-   writeBranchLink(0x0213dcf4, 0x0, marioDamageBuff);
-   writeBranchLink(0x02141674, 0x0, marioDamageBuff3); 
+   //writeBranchLink(0x02141674, 0x0, marioDamageBuff3); 
    writeWord(0x024c9590, 0x0, BLR);
    writeWord(0x024c9468, 0x0, BLR);
 
-  writeBranch(0x02567cec, 0x0, makeBlackPaint);
+  //writeBranch(0x02567cec, 0x0, makeBlackPaint);
   //writeBranch(0x024b25c0, 0x0, makeBlackPaint2);
-  writeBranchLink(0x02567c3c, 0x0, makeBlackPaint3);
+  //writeBranchLink(0x02567c3c, 0x0, makeBlackPaint3);
 
   //writeBranchLink(0x02305e5c, 0x0, fixCutOut);
 
   // assembly patch BLRs and NOPs
    writeWord(0x0218fe1c, 0x0, BLR);
    writeWord(0x0218d578, 0x0, BLR);
-   writeWord(0x02475650, 0x0, BLR);
-   writeWord(0x0218801c, 0x0, NOP);
-   writeWord(0x02312ad8, 0x0, NOP);
-   writeWord(0x02312adc, 0x0, NOP);
-   writeWord(0x02312ae8, 0x0, NOP); 
-   writeWord(0x02312adc, 0x0, NOP);
-   //writeWord(0x0220b080, 0x0, NOP);
+   writeWord(0x02475650, 0x0, BLR); 
+   //writeWord(0x0218801c, 0x0, NOP);
+   writeWord(0x024c84cc, 0x0, BLR);
+  writeBranchLink(0x0218801c, 0x0, runInventoryChecks);
 
    // assembly patch for cutout floats
+   /*
+   //writeWord(0x02312ad8, 0x0, NOP);
+   //writeWord(0x02312adc, 0x0, NOP);
+   //writeWord(0x02312b2c, 0x0, NOP); 
+   //writeWord(0x02312b60, 0x0, NOP);
   writeBranchLink(0x02312b34, 0x0, fixCutoutFloat);
   writeBranchLink(0x02312b40, 0x0, fixCutoutFloat);
   writeBranch(0x02312dfc, 0x0, fixCutOut); 
+  writeBranchLink(0x02312b58, 0x0, permaFixCutout);
+  writeBranch(0x025741b8, 0x0, 0x025741c4);
+  */
   writeBranch(0x0220b078, 0x0, _patchMarioSpeed);
 
   // level up assembly patch
   writeBranch(0x02211b04, 0x0, _patchLevelUps);
   writeBranch(0x0221104c, 0x0, _patchXp);
+  writeBranchLink(0x02211cbc, 0x0, levelupIncreaseDamage);
 
   // painted items patch
   writeBranch(0x0221249c, 0x0, patchPaintedItems);
@@ -545,11 +673,16 @@ void mod_main()
   writeBranchLink(0x02140cb4, 0x0, _visibleDamageCheck);
 
   // health change patch
-  writeBranchLink(0x0213dd14, 0x0, _moreDamage);
-  writeBranchLink(0x0213dcf0, 0x0, _fixDamageBuffIssue);
+  //writeBranchLink(0x0213dd14, 0x0, _moreDamage);
+  //writeBranchLink(0x0213dcf0, 0x0, _fixDamageBuffIssue2);
+  //writeBranchLink(0x0213dcf4, 0x0, marioDamageBuff);
 
   // fix kamek 
   writeBranchLink(0x0218fbf8, 0x0, _handleKamek);
+
+  // enemy attack patches
+  writeBranchLink(0x02440b94, 0x0, enemyAttack);
+
 
   return;
 }

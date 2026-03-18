@@ -2354,6 +2354,10 @@ inline s32 GetHP() {
     return ((s32(*)())0x0247538c)();
 }
 
+inline void AddXP(XpStruct * xp, int count) {
+    return ((void(*)(XpStruct * xp, int count))0x02211048)(xp, count);
+}
+
 inline s32 GetLevel() {
     return ((s32(*)())0x02475314)();
 }
@@ -2370,6 +2374,13 @@ inline void AddPanelByID(MarioPouch* pouchPanels, s32 id) {
     return ((void(*)(MarioPouch* pouchPanels, s32 id))0x0220d648)(pouchPanels, id);
 }
 
+inline void KillPanels(short * panels) {
+    return ((void(*)(short * panels))0x0220d5f4)(panels);
+}
+
+inline void RefreshInventory(short * panels, short id) {
+    return ((void(*)(short * panels, short id))0x022108e8)(panels, id);
+}
 
 void SetHP(s32 hp);
 void GetInk(GameInk * ink);
