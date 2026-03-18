@@ -2,9 +2,10 @@
 Makes the game's battles fun (only available for the US version of color splash)
 
 ## Contents
-- **Cards are no longer used up after using them in battle**
+- **Cards are no longer used up after using them in battle, apart from 1-UP cards for balance reasons**
 - **Mario's damage to his enemy is dynamically displayed**
 - **Each level up increases your damage output by 10%, including first strikes**
+- **Boss fights no longer one-shot you if you don't use the thing card at exactly the right time**
 - **Thing cards required for boss fights replace thing replicas in the battle spinner**
 - **Press B during dialogue to skip through text**
 - **Partner cards are now usable in boss fights**
@@ -24,7 +25,6 @@ Makes the game's battles fun (only available for the US version of color splash)
 - Leveling up gives you more paint than before, and hammer scraps level you up faster
 - The amount of damage that cards do is listed on the card description, and enemy max HP is listed
 - You get less 1-UP cards from the battle spinner
-- 1-UP cards aren't available in the shop as early, unlocking once Mossrock theatre is visited instead of during chapter 3
 
 ## Installation
 Go to the [releases page](https://github.com/L5050/Color-Splash-Reshuffled/releases) and download the most recent release files (Reshuffled.zip and cafeLibs.zip). Unzip Reshuffled.zip into the graphics packs folder in Cemu, then right click color splash in Cemu and click "Edit Graphics Packs". You should see the Reshuffled mod under the mods section, click the checkbox and you're halfway done! Unzip cafeLibs.zip directly into the Cemu folder (go to Cemu, click on File, then click Open Cemu folder) and you're now good to play!
