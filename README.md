@@ -9,8 +9,6 @@ Makes the game's battles fun (only available for the US version of color splash)
 - **Thing cards required for boss fights replace thing replicas in the battle spinner**
 - **Press B during dialogue to skip through text**
 - **Partner cards are now usable in boss fights**
-- Damage from enemies is capped at 199, preventing some attacks from one-shotting you when at full HP and max HP
-- Cutout is now completed automatically
 - Collecting a painted card will instead collect the unpainted variant to make the paint economy and leveling up more important (apart from some exceptions and the battle spinner)
 - Mario takes x2 damage in battles
 - Battles now make the surrounding area covered in black paint
