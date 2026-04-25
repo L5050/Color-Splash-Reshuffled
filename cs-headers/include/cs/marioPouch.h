@@ -2378,6 +2378,10 @@ inline void KillPanels(short * panels) {
     return ((void(*)(short * panels))0x0220d5f4)(panels);
 }
 
+inline void FillInk(MarioPouch * pouch) {
+    return ((void(*)(MarioPouch * pouch))0x02211748)(pouch);
+}
+
 inline void RefreshInventory(short * panels, short id) {
     return ((void(*)(short * panels, short id))0x022108e8)(panels, id);
 }

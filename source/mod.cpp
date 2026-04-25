@@ -9,6 +9,7 @@
 #include <cs/btl_unit.h>
 #include <cs/btl_weapon.h>
 #include <cs/btl_eff.h>
+#include <cs/btl_set.h>
 #include <cs/evt.h>
 #include <cstring>
 
@@ -470,21 +471,21 @@ typedef struct
 
 Vec3 cutoutVec = {0.0f, 0.0f, 0.0f};
 
-int permaFixCutout()
+int permaFixCutout(int param_1)
 {
-  ((void (*)(Vec3 *))0x0257418c)(&cutoutVec);
-  return ((int (*)(f32 x, f32 y))0x02301e54)(cutoutVec.x, cutoutVec.y);
+  ((void (*)(Vec3 *, int param_2))0x0257418c)(&cutoutVec, 0x35ec0c08);
+  return ((int (*)(int param, f32 x, f32 y))0x02301e54)(param_1, cutoutVec.x, cutoutVec.y);
 }
 
 void fixCutOut(int* pointer)
 { 
   asm("mr 3, 30");
-  return ((void (*)(int* integer, int cutout))0x02306a68)(pointer, 0x5);
+  return ((void (*)(int* integer, int cutout))0x023129a8)(pointer, 0x4);
 }
 
 f32 fixCutoutFloat()
 {
-  return 75.0f;
+  return 36.0f;
 }
 
 static void patchPaintedItems(cs::mario_pouch::MarioPouch* pouchPanels, s32 id)
@@ -499,13 +500,15 @@ static void patchPaintedItems(cs::mario_pouch::MarioPouch* pouchPanels, s32 id)
 
 bool attacksChanged = false;
 
+int ogLevel;
+
 static int enemyAttack()
 {
-  int currentLevel = (*cs::mario_pouch::GetMarioPouch())->xpStruct.level;
   if (attacksChanged == true)
   {
     return 0;
   }
+  int currentLevel = ogLevel = (*cs::mario_pouch::GetMarioPouch())->xpStruct.level;
 
   cs::btl_unit::Actor * actorStruct = cs::btl_unit::returnActorData("CAMERA_MAR");
   for (u32 i = 0; i < 263; i++) 
@@ -520,7 +523,29 @@ static int enemyAttack()
   for (u32 i = 0; i < 168; i++) 
   {
     weaponStruct[i].Painted_Bonus_Damage *= damageBuff;
-  }
+  } 
+  cs::btl_weapon::returnWeaponData("MTN_FIRE_ATTACK")->Painted_Bonus_Damage = 25;
+  //cs::btl_weapon::returnWeaponData("M_SMALL_HAMMER_X3")->attack_type = "attack_normal";
+  //cs::btl_weapon::returnWeaponData("M_SMALL_HAMMER_X3")->script_path = "btl/player/as_btl_hammer_normal";
+  
+  /*
+  cs::btl_weapon::returnWeaponData("M_SMALL_HAMMER_X3")->field28_0x6c = 0x64;
+  cs::btl_weapon::returnWeaponData("M_SMALL_HAMMER_X3")->field29_0x70 = 0x64;
+  cs::btl_weapon::returnWeaponData("M_SMALL_HAMMER_X3")->field30_0x74 = 0x64;
+  cs::btl_weapon::returnWeaponData("M_SMALL_HAMMER_X3")->field31_0x78 = 0x64;
+  cs::btl_weapon::returnWeaponData("M_SMALL_HAMMER_X3")->field32_0x7c = 0x64;
+  cs::btl_weapon::returnWeaponData("M_SMALL_HAMMER_X3")->field33_0x80 = 0x64;
+  cs::btl_weapon::returnWeaponData("M_SMALL_HAMMER_X3")->field34_0x84 = 0x64;
+  cs::btl_weapon::returnWeaponData("M_SMALL_HAMMER_X3")->field35_0x88 = 0x64;
+  cs::btl_weapon::returnWeaponData("M_SMALL_HAMMER_X3")->field36_0x8c = 0x64;
+  cs::btl_weapon::returnWeaponData("M_SMALL_HAMMER_X3")->field37_0x90 = 0x64;
+  cs::btl_weapon::returnWeaponData("M_SMALL_HAMMER_X3")->field38_0x94 = 0x64;*/ 
+  cs::btl_weapon::returnWeaponData("M_FIRE_HAMMER")->cost.red *= 3;
+  cs::btl_weapon::returnWeaponData("M_SMALL_HAMMER_X3")->danceTurns = 1;
+  cs::btl_weapon::returnWeaponData("M_SMALL_HAMMER_X3")->attack_count = 1;
+  cs::btl_weapon::returnWeaponData("BPK_HIP_ATTACK")->magentaTurns = 3;
+  cs::btl_weapon::returnWeaponData("M_KINOKO")->redTurns = 2;
+  cs::btl_weapon::returnWeaponData("M_BIG_KINOKO")->redTurns = 2;
 
   weaponStruct = cs::btl_weapon::returnWeaponData("KUR_HEAD_ATTACK"); // set the index to enemy attacks
   for (u32 i = 0; i < 655; i++) 
@@ -529,9 +554,13 @@ static int enemyAttack()
     {
       weaponStruct[i].Painted_Bonus_Damage *= 2;
     }
-  }
+  } 
   cs::btl_weapon::returnWeaponData("MTN_FIRE_ATTACK")->Painted_Bonus_Damage = 25;
   cs::btl_weapon::returnWeaponData("IGY_DOSSUN_ATTACK")->Painted_Bonus_Damage = 30;
+  cs::btl_weapon::returnWeaponData("IGY_MAGIC_TRI_ATTACK")->Painted_Bonus_Damage = 0xF;
+  cs::btl_weapon::returnWeaponData("IGY_MAGIC_TRI_ATTACK")->orangeTurns = 2;
+  cs::btl_weapon::returnWeaponData("IGY_MAGIC_ATTACK")->orangeTurns = 2;
+  cs::btl_weapon::returnWeaponData("IGY_KOURA_ATTACK")->orangeTurns = 2;
   cs::btl_weapon::returnWeaponData("LDW_MISSILE_KILL_ATTACK")->Painted_Bonus_Damage = 15;
   cs::btl_weapon::returnWeaponData("WDY_COIN_1_ATTACK")->Painted_Bonus_Damage = 0;
   cs::btl_weapon::BattleWeapon * larry = cs::btl_weapon::returnWeaponData("LAR_SPECIAL_HIP_ATTACK");
@@ -542,6 +571,11 @@ static int enemyAttack()
   larry->Bonus_Damage_4 = 40;
   cs::btl_weapon::returnWeaponData("LMY_BIG_BALL_ATTACK")->Painted_Bonus_Damage = 3;
   cs::btl_weapon::returnWeaponData("LMY_BIG_BALL_LAST_ATTACK")->Painted_Bonus_Damage = 15;
+
+  cs::btl_set::returnSetData("V2_VP_SET_02")->Enemy_List[3].enemyID = "B_MG_OUT_BRS";
+  cs::btl_set::returnSetData("V2_VP_SET_03")->Enemy_List[2].enemyID = "GBN";
+  cs::btl_set::returnSetData("V2_VP_SET_03")->Enemy_List[3].enemyID = "ST_MUC_R";
+  cs::btl_set::returnSetData("V2_VP_SET_03")->Enemy_List[4].enemyID = "ST_MUC_Y";
 
   attacksChanged = true;
   return 0;
@@ -580,25 +614,26 @@ void runInventoryChecks(int param_1)
   return;
 }
 
-
-
-void levelupIncreaseDamage(cs::mario_pouch::XpStruct * xp, int count)
+void levelupIncreaseDamage()
 {
-  cs::mario_pouch::AddXP(xp, count);
-  int currentLevel = (*cs::mario_pouch::GetMarioPouch())->xpStruct.level - 1;
-  f32 fCurrentLevel = (f32)currentLevel;
-  f32 damageBuff = (fCurrentLevel / 10.0f) + 1.0f;
-  cs::btl_weapon::BattleWeapon * weaponStruct = cs::btl_weapon::returnWeaponData("DUMMY"); // set the index to player attacks
-  for (u32 i = 0; i < 168; i++) 
+  if (ogLevel < (*cs::mario_pouch::GetMarioPouch())->xpStruct.level)
   {
-    weaponStruct[i].Painted_Bonus_Damage /= damageBuff;
+    int currentLevel = ogLevel;
+    f32 fCurrentLevel = (f32)currentLevel;
+    f32 damageBuff = (fCurrentLevel / 10.0f) + 1.0f;
+    cs::btl_weapon::BattleWeapon *weaponStruct = cs::btl_weapon::returnWeaponData("DUMMY"); // set the index to player attacks
+    for (u32 i = 0; i < 168; i++)
+    {
+      weaponStruct[i].Painted_Bonus_Damage /= damageBuff;
+    }
+    fCurrentLevel = (f32)(*cs::mario_pouch::GetMarioPouch())->xpStruct.level;
+    damageBuff = (fCurrentLevel / 10.0f) + 1.0f;
+    for (u32 i = 0; i < 168; i++)
+    {
+      weaponStruct[i].Painted_Bonus_Damage *= damageBuff;
+    }
   }
-  fCurrentLevel = (f32)(*cs::mario_pouch::GetMarioPouch())->xpStruct.level + 1;
-  damageBuff = (fCurrentLevel / 10.0f) + 1.0f;
-  for (u32 i = 0; i < 168; i++) 
-  {
-    weaponStruct[i].Painted_Bonus_Damage *= damageBuff;
-  }
+  asm("li 5, 0x1");
   return;
 }
 
@@ -643,20 +678,19 @@ void mod_main()
    writeWord(0x0218fe1c, 0x0, BLR);
    writeWord(0x0218d578, 0x0, BLR);
    writeWord(0x02475650, 0x0, BLR); 
-   //writeWord(0x0218801c, 0x0, NOP);
    writeWord(0x024c84cc, 0x0, BLR);
   writeBranchLink(0x0218801c, 0x0, runInventoryChecks);
 
    // assembly patch for cutout floats
    /*
-   //writeWord(0x02312ad8, 0x0, NOP);
-   //writeWord(0x02312adc, 0x0, NOP);
-   //writeWord(0x02312b2c, 0x0, NOP); 
-   //writeWord(0x02312b60, 0x0, NOP);
+   writeWord(0x02312ad8, 0x0, NOP);
+   writeWord(0x02312adc, 0x0, NOP);
+   writeWord(0x02312b2c, 0x0, NOP); 
+   writeWord(0x02312b60, 0x0, NOP);
   writeBranchLink(0x02312b34, 0x0, fixCutoutFloat);
   writeBranchLink(0x02312b40, 0x0, fixCutoutFloat);
   writeBranch(0x02312dfc, 0x0, fixCutOut); 
-  writeBranchLink(0x02312b58, 0x0, permaFixCutout);
+  //writeBranchLink(0x02312b58, 0x0, permaFixCutout);
   writeBranch(0x025741b8, 0x0, 0x025741c4);
   */
   writeBranch(0x0220b078, 0x0, _patchMarioSpeed);
@@ -664,7 +698,7 @@ void mod_main()
   // level up assembly patch
   writeBranch(0x02211b04, 0x0, _patchLevelUps);
   writeBranch(0x0221104c, 0x0, _patchXp);
-  writeBranchLink(0x02211cbc, 0x0, levelupIncreaseDamage);
+  writeBranchLink(0x0217dee8, 0x0, levelupIncreaseDamage);
 
   // painted items patch
   writeBranch(0x0221249c, 0x0, patchPaintedItems);
