@@ -11,6 +11,7 @@ Makes the game's battles fun (only available for the US version of color splash)
 - **Partner cards are now usable in boss fights**
 - **New custom card that puts enemies to sleep**
 - **Various boss fights now use the roy paint effects in battle**
+- **Various battle sets have been edited to be more unique and not be ridiculously easy**
 - Collecting a painted card will instead collect the unpainted variant to make the paint economy and leveling up more important (apart from some exceptions and the battle spinner)
 - Mario takes x2 damage in battles
 - Enemies have x3 health
