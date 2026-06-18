@@ -9,9 +9,10 @@ Makes the game's battles fun (only available for the US version of color splash)
 - **Thing cards required for boss fights replace thing replicas in the battle spinner**
 - **Press B during dialogue to skip through text**
 - **Partner cards are now usable in boss fights**
+- **New custom card that puts enemies to sleep**
+- **Various boss fights now use the roy paint effects in battle**
 - Collecting a painted card will instead collect the unpainted variant to make the paint economy and leveling up more important (apart from some exceptions and the battle spinner)
 - Mario takes x2 damage in battles
-- Battles now make the surrounding area covered in black paint
 - Enemies have x3 health
 - Partner cards do more damage
 - Roshambo no longer gives coins as a reward, and doesn't cost any coins to sneak in
@@ -33,3 +34,4 @@ Go to the [releases page](https://github.com/L5050/Color-Splash-Reshuffled/relea
 * Darxoon for creating paintelf and for help with RE
 * [Joby "Jorby" R](https://www.youtube.com/@JobyRJorby) for helping playtest the pre-release builds and giving good criticism/advice
 * [Bringle](https://www.youtube.com/@BringlesCan) for making the new opening cutscene and the new 1-UP card texture
+* [Astronotter](https://www.youtube.com/@Astronotter) for making the Jazz-Hammer texture
