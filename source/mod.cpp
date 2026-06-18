@@ -10,6 +10,7 @@
 #include <cs/btl_weapon.h>
 #include <cs/btl_eff.h>
 #include <cs/btl_set.h>
+#include <cs/item_data.h>
 #include <cs/evt.h>
 #include <cstring>
 
@@ -28,7 +29,6 @@ extern "C"
   f32 _speedBuff = 0.85f;
   void * speedRet = (void *)0x0220b07c;
   void * levelUpRet = (void *)0x02211b08;
-  void * XPRet = (void *)0x02211050;
   void * _damageFunc = (void *)0x0213c1e8; 
   void * _isEnemyBuffFixRet = (void *)0x0213dcf4;
   void * _kamekRet = (void *)0x0218b138;
@@ -72,18 +72,6 @@ extern "C"
     "add 0, 0, 3\n"
     "lis 5, levelUpRet@ha\n"
     "lwz 5, levelUpRet@l(5)\n"
-    "mtctr 5\n"
-    "bctr\n"
-    );
-
-  void _patchXp();
-  asm(
-    ".global _patchXp\n"
-    "_patchXp:\n"
-    "add. 12, 11, 4\n"
-    "add. 12, 11, 4\n"
-    "lis 5, XPRet@ha\n"
-    "lwz 5, XPRet@l(5)\n"
     "mtctr 5\n"
     "bctr\n"
     );
@@ -154,6 +142,18 @@ extern "C"
     "fmuls 10, 10, 3\n"
     "fsubs 29, 29, 10\n"
     "li 5, 0\n"
+    "blr\n"
+    );
+
+  void _fixMinHP();
+  asm(
+    ".global _fixMinHP\n"
+    "_fixMinHP:\n"
+    "lis 5, _fixSoftlock@ha\n"
+    "lfs 4, _fixSoftlock@l(5)\n"
+    "fcmpo 0, 10, 4\n"
+    "beqlr\n"
+    "stfs 31,0x1e8(3)\n"
     "blr\n"
     );
     
@@ -232,7 +232,7 @@ const char *new_GetBattleSpinCard(Unk *param_1, const char *param_2, s32 param_3
   const char *ret = cs::btl_spin::GetBattleSpinCard(param_1, param_2, param_3);
   if (strcmp(ret, "PNL_1UP_KINOKO_100") == 0)
   {
-    return "PNL_KINOKO_100";
+    return "PNL_SALT_AND_PEPPER";
   }
   else
   {
@@ -270,6 +270,10 @@ const char *new_GetBattleSpinCard2(Unk *param_1, const char *param_2, s32 param_
   if (strcmp((const char *)battleSpinNameBuffer, "ROY") == 0)
   {
     return "PNL_WASHER";
+  }
+  if (strcmp((const char *)battleSpinNameBuffer, "BEEF") == 0)
+  {
+    return "PNL_SALT_AND_PEPPER";
   }
   return cs::btl_spin::GetBattleSpinCard(param_1, param_2, param_3);
 }
@@ -314,6 +318,10 @@ int *BtlSpinNameHook(int *param_1, s32 param_2)
     {
       strcpy(battleSpinNameBuffer, (const char *)turtle);
     }
+    if (strcmp((const char *)turtle, "BEEF") == 0)
+    {
+      strcpy(battleSpinNameBuffer, (const char *)turtle);
+    }
   }
   return ((int *(*)(int *param_1, s32 param_2))0x0212ead8)((int *)0x4f9c2c88, param_2);
 }
@@ -324,10 +332,6 @@ s32 randomCrits(s32 curLvl)
   if (chance == 0)
   {
     return 7; // 7 is an excellent
-  }
-  if (curLvl > 6)
-  {
-    curLvl = 6;
   }
   return curLvl;
 }
@@ -508,13 +512,25 @@ static int enemyAttack()
   {
     return 0;
   }
+  cs::item_data::ItemEntry ** entryArrayPtr = (*cs::item_data::GetItemData());
+  cs::item_data::ItemEntry * entries = entryArrayPtr[13];
+  entries->XP_Value *= 2;
+  entries = entryArrayPtr[12];
+  entries->XP_Value *= 2;
+  entries = entryArrayPtr[11];
+  entries->XP_Value *= 2;
+
   int currentLevel = ogLevel = (*cs::mario_pouch::GetMarioPouch())->xpStruct.level;
 
   cs::btl_unit::Actor * actorStruct = cs::btl_unit::returnActorData("CAMERA_MAR");
-  for (u32 i = 0; i < 263; i++) 
+  for (u32 i = 0; i < 263; i++)
   {
     actorStruct[i].HP *= 3;
   }
+  cs::btl_unit::returnActorData("LDW_SHIP")->HP = 3;
+  cs::btl_unit::returnActorData("PAT")->HP = 100;
+  cs::btl_unit::returnActorData("ST_HEI_B")->HP *= 2;
+  //cs::btl_set::returnSetData("BB_DY_BOSS")->Enemy_List[4].enemyID = "ST_HEI_B";
 
   f32 fCurrentLevel = (f32)currentLevel;
   f32 damageBuff = (fCurrentLevel / 10.0f) + 1.0f;
@@ -544,8 +560,8 @@ static int enemyAttack()
   cs::btl_weapon::returnWeaponData("M_SMALL_HAMMER_X3")->danceTurns = 1;
   cs::btl_weapon::returnWeaponData("M_SMALL_HAMMER_X3")->attack_count = 1;
   cs::btl_weapon::returnWeaponData("BPK_HIP_ATTACK")->magentaTurns = 3;
-  cs::btl_weapon::returnWeaponData("M_KINOKO")->redTurns = 2;
-  cs::btl_weapon::returnWeaponData("M_BIG_KINOKO")->redTurns = 2;
+  cs::btl_weapon::returnWeaponData("WDY_GLD_HEI_ATTACK")->redTurns = 2;
+  cs::btl_weapon::returnWeaponData("WDY_COIN_1_ATTACK")->redTurns = 2;
 
   weaponStruct = cs::btl_weapon::returnWeaponData("KUR_HEAD_ATTACK"); // set the index to enemy attacks
   for (u32 i = 0; i < 655; i++) 
@@ -562,16 +578,25 @@ static int enemyAttack()
   cs::btl_weapon::returnWeaponData("IGY_MAGIC_ATTACK")->orangeTurns = 2;
   cs::btl_weapon::returnWeaponData("IGY_KOURA_ATTACK")->orangeTurns = 2;
   cs::btl_weapon::returnWeaponData("LDW_MISSILE_KILL_ATTACK")->Painted_Bonus_Damage = 15;
-  cs::btl_weapon::returnWeaponData("WDY_COIN_1_ATTACK")->Painted_Bonus_Damage = 0;
+  //cs::btl_weapon::returnWeaponData("WDY_COIN_1_ATTACK")->Painted_Bonus_Damage = 0;
   cs::btl_weapon::BattleWeapon * larry = cs::btl_weapon::returnWeaponData("LAR_SPECIAL_HIP_ATTACK");
   larry->Painted_Bonus_Damage = 5;
   larry->Bonus_Damage_1 = 10;
   larry->Bonus_Damage_2 = 20;
   larry->Bonus_Damage_3 = 30;
   larry->Bonus_Damage_4 = 40;
-  cs::btl_weapon::returnWeaponData("LMY_BIG_BALL_ATTACK")->Painted_Bonus_Damage = 3;
+  cs::btl_weapon::returnWeaponData("LMY_BIG_BALL_ATTACK")->Painted_Bonus_Damage = 3; 
   cs::btl_weapon::returnWeaponData("LMY_BIG_BALL_LAST_ATTACK")->Painted_Bonus_Damage = 15;
 
+  cs::btl_set::returnSetData("BB_TR_SET_21")->Enemy_List[1].enemyID = "B_PKF";
+  cs::btl_set::returnSetData("BB_TR_SET_22")->Enemy_List[1].enemyID = "MTX_HEI";
+  cs::btl_set::returnSetData("BB_TR_SET_22")->Enemy_List[2].enemyID = "KPA_BBL";
+  cs::btl_set::returnSetData("BB_TR_SET_22")->Enemy_List[3].enemyID = "KPA_BBL";
+  cs::btl_set::returnSetData("BB_TR_SET_23")->Enemy_List[1].enemyID = "SLV_HEI";
+  cs::btl_set::returnSetData("BB_TR_SET_23")->Enemy_List[2].enemyID = "GBN";
+  cs::btl_set::returnSetData("BB_TR_SET_23")->Enemy_List[3].enemyID = "GBN";
+  cs::btl_set::returnSetData("BB_TR_SET_23")->Enemy_List[4].enemyID = "D_HEI";
+  cs::btl_set::returnSetData("BB_TR_SET_23")->BGM = "BGM_BTL_ThiefHeiho";
   cs::btl_set::returnSetData("V2_VP_SET_02")->Enemy_List[3].enemyID = "B_MG_OUT_BRS";
   cs::btl_set::returnSetData("V2_VP_SET_03")->Enemy_List[2].enemyID = "GBN";
   cs::btl_set::returnSetData("V2_VP_SET_03")->Enemy_List[3].enemyID = "ST_MUC_R";
@@ -639,6 +664,7 @@ void levelupIncreaseDamage()
 
 void mod_main()
 {
+
    // Turn off the function thats used in all EVT scripts to set your coin count
    writeWord(cs::mario_pouch::SetCoin, 0x0, BLR);
    // Speed up btl spin menu slightly
@@ -662,7 +688,7 @@ void mod_main()
 
    writeBranch(0x02493594, 0x14C, randomCrits);
 
-   writeBranch(0x024c407c, 0x0, colorEnemy);
+   //writeBranch(0x024c407c, 0x0, colorEnemy);
 
    //writeBranchLink(0x02141674, 0x0, marioDamageBuff3); 
    writeWord(0x024c9590, 0x0, BLR);
@@ -673,12 +699,12 @@ void mod_main()
   //writeBranchLink(0x02567c3c, 0x0, makeBlackPaint3);
 
   //writeBranchLink(0x02305e5c, 0x0, fixCutOut);
-
+  
   // assembly patch BLRs and NOPs
    writeWord(0x0218fe1c, 0x0, BLR);
    writeWord(0x0218d578, 0x0, BLR);
    writeWord(0x02475650, 0x0, BLR); 
-   writeWord(0x024c84cc, 0x0, BLR);
+   //writeWord(0x024c84cc, 0x0, BLR);
   writeBranchLink(0x0218801c, 0x0, runInventoryChecks);
 
    // assembly patch for cutout floats
@@ -697,7 +723,6 @@ void mod_main()
 
   // level up assembly patch
   writeBranch(0x02211b04, 0x0, _patchLevelUps);
-  writeBranch(0x0221104c, 0x0, _patchXp);
   writeBranchLink(0x0217dee8, 0x0, levelupIncreaseDamage);
 
   // painted items patch
@@ -716,6 +741,9 @@ void mod_main()
 
   // enemy attack patches
   writeBranchLink(0x02440b94, 0x0, enemyAttack);
+
+  // minimum health patch
+  writeBranchLink(0x024c84f0, 0x0, _fixMinHP);
 
 
   return;
