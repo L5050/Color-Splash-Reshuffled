@@ -31,6 +31,7 @@ extern "C"
   void * levelUpRet = (void *)0x02211b08;
   void * _damageFunc = (void *)0x0213c1e8; 
   void * _isEnemyBuffFixRet = (void *)0x0213dcf4;
+  void * _battleMenuRet = (void *)0x0219e440;
   void * _kamekRet = (void *)0x0218b138;
   f32 _healthBuff = 0.3f;
   int _isNpcMario = 0;
@@ -105,6 +106,16 @@ extern "C"
     "stw 3, 0(4)\n"
     "lis 5, _isEnemyBuffFixRet@ha\n"
     "lwz 5, _isEnemyBuffFixRet@l(5)\n"
+    "mtctr 5\n"
+    "bctr\n"
+    );
+    
+  void _battleMenuPatch();
+  asm(
+    ".global _battleMenuPatch\n"
+    "_battleMenuPatch:\n"
+    "lis 5, _battleMenuRet@ha\n"
+    "lwz 5, _battleMenuRet@l(5)\n"
     "mtctr 5\n"
     "bctr\n"
     );
@@ -745,6 +756,8 @@ void mod_main()
   // minimum health patch
   writeBranchLink(0x024c84f0, 0x0, _fixMinHP);
 
+  // battle menu patch
+  writeBranch(0x0219e26c, 0x0, _battleMenuPatch);
 
   return;
 }

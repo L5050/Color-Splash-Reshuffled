@@ -25,10 +25,14 @@ Makes the game's battles fun (only available for the US version of color splash)
 - Leveling up gives you more paint than before, and hammer scraps level you up faster
 - The amount of damage that cards do is listed on the card description, and enemy max HP is listed
 - You get less 1-UP cards from the battle spinner
+- The "flick" step in battle is skipped and done automatically
 
 ## Installation
 Go to the [releases page](https://github.com/L5050/Color-Splash-Reshuffled/releases) and download the most recent release files (Reshuffled.zip and cafeLibs.zip). Unzip Reshuffled.zip into the graphics packs folder in Cemu, then right click color splash in Cemu and click "Edit Graphics Packs". You should see the Reshuffled mod under the mods section, click the checkbox and you're halfway done! Unzip cafeLibs.zip directly into the Cemu folder (go to Cemu, click on File, then click Open Cemu folder) and you're now good to play!
 * Note: it is important to use the release rather than the source code because the release contains compressed battle and shop data which replaces some of the game's files
+
+## LICENSE CLARIFICATION
+The folder cs-headers is licensed under the MIT license as it is a submodule, everything else is licensed under GPL v3. PLEASE DO NOT FEED ANY OF THIS CODE TO AI AS IT INHERENTLY BREAKS BOTH LICENSES.
 
 ## Credit
 * Xuman for editing the card shop for me and general help with RE
